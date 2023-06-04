@@ -8,7 +8,12 @@ public class PlayerMovement : MonoBehaviour
 
     private Animator _animator;
 
+    private BoxCollider2D _collider;
+
     private SpriteRenderer _spriteRenderer;
+
+    [SerializeField]
+    private LayerMask jumpableGround;
 
     [SerializeField]
     private float moveSpeed = 7f;
@@ -27,6 +32,7 @@ public class PlayerMovement : MonoBehaviour
     {
         _rb = GetComponent<Rigidbody2D>();
         _animator = GetComponent<Animator>();
+        _collider = GetComponent<BoxCollider2D>();
         _spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
@@ -45,12 +51,17 @@ public class PlayerMovement : MonoBehaviour
 
         _rb.velocity = new Vector2(dirX * moveSpeed, _rb.velocity.y);
 
-        if (Input.GetButtonDown("Jump"))
+        if (Input.GetButtonDown("Jump") && IsGround())
         {
             _rb.velocity = new Vector2(_rb.velocity.x, jumpForce);
         }
 
         UpdateAnimations(dirX);
+    }
+
+    private bool IsGround()
+    {
+        return Physics2D.BoxCast(_collider.bounds.center, _collider.bounds.size, 0f, Vector2.down, .1f,jumpableGround );
     }
 
     private void UpdateAnimations(float dirX)
